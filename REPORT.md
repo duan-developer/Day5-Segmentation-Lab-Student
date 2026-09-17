@@ -1,7 +1,7 @@
 # Báo cáo kiểm tra repository Day 5 — Segmentation Data Lab
-**Mã học viên theo lớp:**  2A202602103
-**Ngày / CVAT local:** 17/09/2026  
-**Phạm vi:** toàn bộ cây thư mục hiện có, gồm tài liệu, mã nguồn, cấu hình CI, notebook, dữ liệu task, ảnh đầu vào và 9 ZIP trong `submissions/`.
+**Mã học viên theo lớp:** 2A202602103  
+**Ngày / CVAT local:** 17/09/2026 / http://localhost:8080  
+**Công cụ đã dùng:** Brush, Polygon, gợi ý tự động và QC thủ công trong CVAT.
 
 
 ## 1. Bài đã nộp
@@ -25,23 +25,37 @@ Phân bố annotation COCO đáng chú ý: Medium có 30 `person`, 32 `car`, 4 `
 
 ## 2. Một quyết định trước khi dùng gợi ý
 
-Kho lưu trữ không lưu lịch sử thao tác CVAT, thứ tự vẽ hoặc thông tin người thực hiện. Vì vậy không thể kiểm chứng trung thực object Medium nào được vẽ trước khi dùng gợi ý tự động; không nên bịa quyết định này từ ZIP.
+- Ảnh, vị trí và object Medium đầu tiên tự vẽ:
+  `000000181542.jpg`, người phụ nữ đứng ở giữa ảnh.
 
-- Object Medium đầu tiên tự vẽ: **chưa có bằng chứng trong repository**.
-- Class và quy tắc chọn biên: cần người thực hiện bổ sung từ phiên CVAT; quy tắc của lab là chỉ mask phần nhìn thấy và mỗi vật đếm được là một instance riêng.
-- Việc dùng gợi ý và hành động sửa/giữ: **không thể suy ra từ COCO export**.
+- Class và quy tắc tôi dùng để chọn biên:
+  `person`. Tôi vẽ sát phần cơ thể và quần áo đang nhìn thấy,
+  không lấy nền và không tự suy đoán phần bị vật khác che.
+
+- Nếu dùng gợi ý sau đó:
+  Sau object đầu tiên tự vẽ, tôi có dùng gợi ý tự động ở một số task.
+  Tôi kiểm lại class, biên và số instance; các gợi ý sai được sửa hoặc xóa trước khi export.
 
 ## 3. Một lỗi tôi tìm thấy và sửa
 
-**Lỗi môi trường đã quan sát được:** chạy `python scripts/inspect_submissions.py --dir submissions` trong PowerShell mặc định bị dừng sau ba tier do console dùng mã hóa `cp1252` không in được ký tự tiếng Việt `ỉ`. Chạy lại với `PYTHONIOENCODING=utf-8` cho kết quả đầy đủ: 9/9 ZIP là `OK`.
+- Task/ảnh/vùng:
+  `cp5_occlusion`, ảnh `000000336232.jpg`.
 
-- Task/ảnh/vùng: bước QC toàn bộ submission, không liên quan đến một mask cụ thể.
-- Loại lỗi: môi trường/mã hóa đầu ra.
-- Bằng chứng: `UnicodeEncodeError: 'charmap' codec can't encode character '\u1ec9'` tại lệnh `print` của script.
-- Cách xử lý đã xác nhận: trong PowerShell chạy `$env:PYTHONIOENCODING='utf-8'; python scripts/inspect_submissions.py --dir submissions`.
-- Đã Save/export lại chưa: không cần; ZIP không có lỗi cấu trúc.
+- Lỗi thuộc loại:
+  sai lớp / dùng nhầm bộ label.
 
-Chưa có điểm tự đánh giá vì reference được bảo vệ không nằm trong repo. Công cụ scoring được thiết kế để từ chối chấm khi thiếu reference, nên không diễn giải tình trạng này thành điểm 0.
+- Bằng chứng tôi nhìn thấy:
+  Trong CVAT xuất hiện các annotation `road` và `traffic sign`,
+  không thuộc bộ class của `cp5_occlusion`.
+
+- Quy tắc và hành động sửa:
+  Tôi kiểm lại `cvat-labels.json` của checkpoint và sửa task/annotation,
+  chỉ giữ các class `person`, `bicycle`, `car`, `motorcycle`, `bus`, `truck`.
+  Tôi tiếp tục kiểm quy tắc vật bị che vẫn là một instance.
+
+- Sau sửa đã Save và export lại chưa?
+  Có. Tôi đã Save, export lại `cp5_occlusion.zip` và chạy
+  `inspect_submissions.py`; kết quả `[OK]`.
 
 ## 4. Ba ca chưa chắc hoặc đã cân nhắc
 
