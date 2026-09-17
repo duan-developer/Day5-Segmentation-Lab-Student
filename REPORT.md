@@ -1,59 +1,62 @@
-# Báo cáo Day 5 — điền trực tiếp trong fork của bạn
+# Báo cáo kiểm tra repository Day 5 — Segmentation Data Lab
+**Mã học viên theo lớp:**  2A202602103
+**Ngày / CVAT local:** 17/09/2026  
+**Phạm vi:** toàn bộ cây thư mục hiện có, gồm tài liệu, mã nguồn, cấu hình CI, notebook, dữ liệu task, ảnh đầu vào và 9 ZIP trong `submissions/`.
 
-**Cách dùng:** Thay mọi dấu `…` bằng bài làm thật của bạn trước khi nộp link fork trên VLearn. Giữ nguyên bốn mục và bảng để coach đọc nhanh. Viết ngắn, cụ thể theo ảnh/vùng; không cần thuật ngữ chuyên sâu. Ví dụ trong [hướng dẫn mẫu](reports/REPORT_TEMPLATE.md) chỉ giúp hiểu cách điền, không phải câu trả lời để chép lại.
-
-- Mã học viên theo lớp: …
-- Ngày / CVAT local: …
-- Công cụ đã dùng: …
-
-Mã học viên là mã lớp cấp; không cần ghi họ tên trong report nếu kênh VLearn đã nhận diện bạn. Chỉ ghi công cụ thật sự đã dùng; không có SAM vẫn làm bài bình thường.
 
 ## 1. Bài đã nộp
 
-Ghi tên ZIP đúng như file trong `submissions/` và số ảnh đã vẽ, Save. Chưa làm hoặc export lỗi thì ghi `chưa có`, không tạo ZIP rỗng. Cột điểm là điểm tối đa của task, **không phải điểm tự chấm**.
+Tất cả ZIP trong `submissions/` đều tồn tại và được `scripts/inspect_submissions.py` đọc thành công khi chạy với UTF-8. Các số mask dưới đây là số annotation có trong export, **không phải số object/mask đúng theo đáp án**.
 
-| Task | File ZIP đúng tên | Hoàn thành mấy ảnh | Điểm tối đa (coach chấm sau) |
-| --- | --- | ---: | ---: |
-| easy_semantic | … | … / 3 | 20 |
-| medium_instance | … | … / 3 | 32 |
-| hard_panoptic | … | … / 2 | 30 |
-| cp1_holes | … | … / 1 | 3 |
-| cp2_slice | … | … / 1 | 3 |
-| cp5_occlusion | … | … / 1 | 3 |
-| cp3_thin | … | … / 1 | 3 |
-| cp4_curb | … | … / 1 | 3 |
-| cp6_coverage | … | … / 1 | 3 |
-| **Tổng tối đa** | | | **100** |
+| Task | File ZIP đúng tên | Hoàn thành mấy ảnh | Kiểm tra cấu trúc | Điểm tối đa (coach chấm sau) |
+| --- | --- | ---: | --- | ---: |
+| easy_semantic | `easy_semantic.zip` | 3 / 3 | OK; 3 mask semantic | 20 |
+| medium_instance | `medium_instance.zip` | 3 / 3 | OK; 68 annotation RLE | 32 |
+| hard_panoptic | `hard_panoptic.zip` | 2 / 2 | OK; 98 annotation (93 RLE, 5 polygon) | 30 |
+| cp1_holes | `cp1_holes.zip` | 1 / 1 | OK; 5 annotation RLE | 3 |
+| cp2_slice | `cp2_slice.zip` | 1 / 1 | OK; 13 annotation RLE | 3 |
+| cp5_occlusion | `cp5_occlusion.zip` | 1 / 1 | OK; 41 annotation RLE | 3 |
+| cp3_thin | `cp3_thin.zip` | 1 / 1 | OK; 1 mask semantic | 3 |
+| cp4_curb | `cp4_curb.zip` | 1 / 1 | OK; 1 mask semantic | 3 |
+| cp6_coverage | `cp6_coverage.zip` | 1 / 1 | OK; 1 mask semantic | 3 |
+| **Tổng tối đa** | **9 / 9 ZIP** | **14 / 14** | **Không có lỗi hợp đồng export** | **100** |
 
-Nếu export lỗi, ghi task, dữ liệu đã Save đến đâu và lỗi đã báo coach.
+Phân bố annotation COCO đáng chú ý: Medium có 30 `person`, 32 `car`, 4 `motorcycle`, 2 `bus`; Hard có 54 `car`, 10 `building`, 7 `person`, 5 `vegetation`, 5 `truck` cùng các class còn lại. Các checkpoint instance tương ứng có 5, 13 và 41 annotation. Những con số này hữu ích cho QC thủ công, nhưng không thay thế đối chiếu reference.
 
 ## 2. Một quyết định trước khi dùng gợi ý
 
-Chọn object đầu tiên bạn tự vẽ ở `medium_instance`, trước khi xem bất kỳ đề xuất tự động nào cho object đó. Ghi ảnh/vị trí đủ để tìm lại; “quy tắc biên” là lý do bạn chọn hoặc dừng mask ở ranh đó.
+Kho lưu trữ không lưu lịch sử thao tác CVAT, thứ tự vẽ hoặc thông tin người thực hiện. Vì vậy không thể kiểm chứng trung thực object Medium nào được vẽ trước khi dùng gợi ý tự động; không nên bịa quyết định này từ ZIP.
 
-- Ảnh, vị trí và object Medium đầu tiên tự vẽ: …
-- Class và quy tắc tôi dùng để chọn biên: …
-- Nếu dùng gợi ý sau đó: vùng gợi ý sai/đúng, hành động sửa/giữ và lý do: …
-- Nếu không dùng gợi ý: ghi “không dùng”; vẫn giải thích một quyết định gán nhãn của mình.
+- Object Medium đầu tiên tự vẽ: **chưa có bằng chứng trong repository**.
+- Class và quy tắc chọn biên: cần người thực hiện bổ sung từ phiên CVAT; quy tắc của lab là chỉ mask phần nhìn thấy và mỗi vật đếm được là một instance riêng.
+- Việc dùng gợi ý và hành động sửa/giữ: **không thể suy ra từ COCO export**.
 
 ## 3. Một lỗi tôi tìm thấy và sửa
 
-Chọn một lỗi **có thật** trong bài. Nếu công cụ lỗi khiến bạn chưa sửa được, ghi rõ đã thử gì và cần coach hỗ trợ gì; không ghi “đã sửa” khi chưa sửa.
+**Lỗi môi trường đã quan sát được:** chạy `python scripts/inspect_submissions.py --dir submissions` trong PowerShell mặc định bị dừng sau ba tier do console dùng mã hóa `cp1252` không in được ký tự tiếng Việt `ỉ`. Chạy lại với `PYTHONIOENCODING=utf-8` cho kết quả đầy đủ: 9/9 ZIP là `OK`.
 
-- Task/ảnh/vùng: …
-- Lỗi thuộc loại: sai lớp / thiếu-thừa vật / gộp-tách / biên / phủ vùng / khác: …
-- Bằng chứng tôi nhìn thấy: …
-- Quy tắc và hành động sửa: …
-- Sau sửa đã Save và export lại chưa? …
+- Task/ảnh/vùng: bước QC toàn bộ submission, không liên quan đến một mask cụ thể.
+- Loại lỗi: môi trường/mã hóa đầu ra.
+- Bằng chứng: `UnicodeEncodeError: 'charmap' codec can't encode character '\u1ec9'` tại lệnh `print` của script.
+- Cách xử lý đã xác nhận: trong PowerShell chạy `$env:PYTHONIOENCODING='utf-8'; python scripts/inspect_submissions.py --dir submissions`.
+- Đã Save/export lại chưa: không cần; ZIP không có lỗi cấu trúc.
 
-Nếu bạn **đã xem Summary tự đánh giá trên GitHub Actions hoặc tự chạy script**, ghi ngắn một kết quả liên quan lỗi vừa sửa (ví dụ task, metric trước/sau nếu có): … / chưa có điểm. Scorecard ba tier tối đa **82**, không phải điểm cuối trên 100. Không tự ghi PASS/top 3/bonus; người phụ trách xác nhận theo tiêu chí lớp. Không đưa file ground truth vào fork.
+Chưa có điểm tự đánh giá vì reference được bảo vệ không nằm trong repo. Công cụ scoring được thiết kế để từ chối chấm khi thiếu reference, nên không diễn giải tình trạng này thành điểm 0.
 
 ## 4. Ba ca chưa chắc hoặc đã cân nhắc
 
-Mỗi ca là một **vùng cụ thể** khiến bạn phải cân nhắc hai cách hiểu. Ghi dấu hiệu nhìn thấy hoặc quy tắc đã dùng, rồi nêu quyết định hoặc câu hỏi cho coach. Không cần ba lỗi; ca đã quyết định được cũng hợp lệ.
-
 | Ảnh/vị trí | Hai cách hiểu có thể | Quy tắc/chứng cứ | Quyết định hoặc câu hỏi cho coach |
 | --- | --- | --- | --- |
-| 1 | … | … | … |
-| 2 | … | … | … |
-| 3 | … | … | … |
+| `cp1_holes` — vùng kính/khe | Khoét thành nền hoặc giữ trong mask vật | Manifest quy định windows/gaps ở trong mask; export có 5 instance | Khi QC trực quan, giữ kính/khe trong mask theo task; cần xem overlay CVAT để xác nhận biên thực tế. |
+| `cp2_slice` — xe cùng class sát nhau | Một mask lớn hoặc nhiều instance | Manifest yêu cầu các xe kề nhau phải là instance riêng; export có 13 mask | Đối chiếu từng xe trong CVAT, không kết luận chỉ bằng số mask. |
+| `cp5_occlusion` — vật bị che | Tách hai mảng nhìn thấy thành hai object hoặc giữ một instance | Manifest yêu cầu vật bị che vẫn là một mask/instance; export có 41 mask | Kiểm lại định danh object theo từng ảnh trước chấm; COCO export không ghi ý định của người gán nhãn. |
+
+## Cấu trúc và thành phần chính
+
+- `data/`: manifest, schema class/CVAT label và ảnh của 3 tier cùng 6 checkpoint. `classes.json` là nguồn chuẩn class; `cvat-labels.json` là payload để dán vào CVAT Raw Labels.
+- `submissions/`: 9 export CVAT hiện diện. Semantic dùng **Segmentation mask 1.1**; instance và panoptic dùng **COCO 1.0**.
+- `scripts/inspect_submissions.py`: kiểm tra tên ZIP, ảnh, class và dạng mask; không chấm biên hay số object đúng. `package_submission.py` đóng gói report/export kèm SHA-256. `convert_label_cvat.py` tái tạo label CVAT; `install_reference.py` cài package reference có kiểm soát.
+- `scoring/` và `lab_utils.py`: tính mIoU cho semantic, matching IoU/precision/recall cho instance, PQ/SQ/RQ cho panoptic khi có ground truth. Điểm tự đánh giá ba tier bị giới hạn ở 82; checkpoint vẫn thuộc rubric 100.
+- `notebooks/day5-segmentation-tu-kiem.ipynb`: notebook QC tùy chọn, không tạo đáp án hoặc tự chấm khi thiếu reference.
+- `README.md`, `GUIDE.md`, `CVAT_SETUP.md`, `docs/`, `lab-guide.html` và `RUBRIC.md`: hướng dẫn thao tác CVAT, QC, fork/push/VLearn, rubric và tự đánh giá.
+- `.github/workflows/day5-self-check.yml`: workflow tự kiểm khi push ZIP/report; sau release reference chính thức mới có thể chấm ba tier.
